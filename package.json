@@ -13,7 +13,7 @@
     "url": "https://github.com/Microsoft/vscode-github-issues-prs/issues"
   },
   "engines": {
-    "vscode": "^1.31.0"
+    "vscode": "1.31.0"
   },
   "categories": [
     "Other"
@@ -194,7 +194,7 @@
   },
   "devDependencies": {
     "@types/node": "10.3.0",
-    "@types/vscode": "^1.31.0",
+    "@types/vscode": "1.31.0",
     "typescript": "3.3.4000"
   },
   "dependencies": {

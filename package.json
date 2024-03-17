@@ -189,7 +189,7 @@
   },
   "devDependencies": {
     "@types/node": "10.3.0",
-    "@types/vscode": "^1.31.0",
+    "@types/vscode": "1.31.0",
     "typescript": "3.3.4000"
   },
   "icon": "images/icon.png"

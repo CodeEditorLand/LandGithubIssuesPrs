@@ -193,13 +193,13 @@
     "compile": "tsc -watch -p ./"
   },
   "devDependencies": {
-    "@types/node": "10.3.0",
-    "@types/vscode": "1.31.0",
-    "typescript": "3.3.4000"
+    "@types/node": "20.11.28",
+    "@types/vscode": "1.87.0",
+    "typescript": "5.4.2"
   },
   "dependencies": {
-    "@octokit/rest": "15.18.1",
+    "@octokit/rest": "20.0.2",
     "git-credential-node": "1.1.0",
-    "moment": "2.24.0"
+    "moment": "2.30.1"
   }
 }

@@ -193,7 +193,7 @@
     "compile": "tsc -watch -p ./"
   },
   "devDependencies": {
-    "@types/node": "20.11.28",
+    "@types/node": "20.11.30",
     "@types/vscode": "1.87.0",
     "typescript": "5.4.2"
   },

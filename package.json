@@ -1,27 +1,7 @@
 {
 	"name": "github-issues-prs",
 	"displayName": "GitHub Issues",
-	"version": "0.0.1",
-	"private": false,
 	"description": "View the issues assigned to you in the Explorer viewlet.",
-	"keywords": [
-		"land"
-	],
-	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandGitHubIssuesPrs#readme",
-	"bugs": {
-		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandGitHubIssuesPrs/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+HTTPS://github.com/CodeEditorLand/LandGitHubIssuesPrs.git"
-	},
-	"license": "SEE LICENSE IN LICENSE",
-	"author": {
-		"name": "🛬 Land —",
-		"email": "Land@PlayForm.Cloud",
-		"url": "HTTPS://Land.PlayForm.Cloud"
-	},
-	"type": "module",
 	"main": "./out/src/extension",
 	"scripts": {
 		"Document": "Document 'Source/**/*.ts'",
@@ -200,11 +180,7 @@
 	},
 	"devDependencies": {
 		"@playform/build": "0.0.7",
-		"@playform/document": "0.0.6",
 		"@types/node": "20.12.10"
-	},
-	"publishConfig": {
-		"access": "public"
 	},
 	"icon": "images/icon.png"
 }

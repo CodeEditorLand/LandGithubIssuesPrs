@@ -1,5 +1,5 @@
-import * as cp from 'child_process';
-import * as GitHub from '@octokit/rest';
+import * as cp from "child_process";
+import * as GitHub from "@octokit/rest";
 
 export interface ExecResult {
 	error: Error | null;
@@ -16,7 +16,7 @@ export function exec(command: string, options: cp.ExecOptions) {
 }
 
 export function sleep(millis: number) {
-	return new Promise<void>(resolve => {
+	return new Promise<void>((resolve) => {
 		setTimeout(resolve, millis);
 	});
 }
@@ -25,13 +25,13 @@ export function allMatches(regex: RegExp, string: string, group: number) {
 	return {
 		[Symbol.iterator]: function* () {
 			let m: RegExpExecArray | null;
-			while (m = regex.exec(string)) {
+			while ((m = regex.exec(string))) {
 				yield m[group];
 				if (regex.lastIndex === m.index) {
 					regex.lastIndex++;
 				}
 			}
-		}
+		},
 	};
 }
 

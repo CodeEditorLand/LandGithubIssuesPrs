@@ -1,5 +1,4 @@
-declare module 'git-credential-node' {
-
+declare module "git-credential-node" {
 	interface Credentials {
 		username: string;
 		password: string;

@@ -171,7 +171,7 @@
 	},
 	"description": "View the issues assigned to you in the Explorer viewlet.",
 	"devDependencies": {
-		"@types/node": "22.8.6"
+		"@types/node": "22.9.0"
 	},
 	"displayName": "GitHub Issues",
 	"icon": "images/icon.png",

@@ -1,7 +1,11 @@
 {
-	"activationEvents": [
-		"onView:githubIssuesPrs"
-	],
+	"name": "github-issues-prs",
+	"displayName": "GitHub Issues",
+	"description": "View the issues assigned to you in the Explorer viewlet.",
+	"main": "./out/src/extension",
+	"scripts": {
+		"compile": "tsc -watch -p ./"
+	},
 	"contributes": {
 		"commands": [
 			{
@@ -164,20 +168,16 @@
 			]
 		}
 	},
+	"activationEvents": [
+		"onView:githubIssuesPrs"
+	],
 	"dependencies": {
 		"@octokit/rest": "21.0.2",
 		"git-credential-node": "1.1.0",
 		"moment": "2.30.1"
 	},
-	"description": "View the issues assigned to you in the Explorer viewlet.",
 	"devDependencies": {
 		"@types/node": "22.9.1"
 	},
-	"displayName": "GitHub Issues",
-	"icon": "images/icon.png",
-	"main": "./out/src/extension",
-	"name": "github-issues-prs",
-	"scripts": {
-		"compile": "tsc -watch -p ./"
-	}
+	"icon": "images/icon.png"
 }

@@ -148,10 +148,14 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 		subscriptions.push(
 			workspace.onDidChangeConfiguration(() => {
 				const config = workspace.getConfiguration("github");
+
 				const newUsername = config.get<string>("username");
+
 				const newRepositories =
 					config.get<string[]>("repositories") || [];
+
 				const newHost = config.get<string>("host");
+
 				if (
 					newUsername !== this.username ||
 					JSON.stringify(newRepositories) !==
@@ -203,6 +207,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 
 	private async createIssue() {
 		const remotes = await this.getGitHubRemotes();
+
 		if (!remotes.length) {
 			return false;
 		}
@@ -221,6 +226,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 			window.showInformationMessage(
 				"There is no remote to get data from!",
 			);
+
 			return;
 		}
 
@@ -257,6 +263,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 		// shortcut when there is just one remote
 		if (urls.length === 1) {
 			callback(urls[0]);
+
 			return;
 		}
 
@@ -274,12 +281,15 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 
 	private async fetchChildren(element?: TreeItem): Promise<TreeItem[]> {
 		const remotes = await this.getGitHubRemotes();
+
 		if (!remotes.length) {
 			return [new TreeItem("No GitHub repositories found")];
 		}
 
 		const { username, password } = remotes[0];
+
 		const assignee = this.username || username || undefined;
+
 		if (!assignee) {
 			const configure = new TreeItem(
 				'Configure "github.username" in settings',
@@ -288,10 +298,12 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 				title: "Open Settings",
 				command: "workbench.action.openGlobalSettings",
 			};
+
 			return [configure];
 		}
 
 		let issues: Issue[];
+
 		try {
 			issues = await this.fetchAllIssues(
 				remotes,
@@ -317,11 +329,16 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 		}
 
 		const milestoneIndex: { [title: string]: Milestone } = {};
+
 		const milestones: Milestone[] = [];
+
 		for (const issue of issues) {
 			const m = issue.item.milestone;
+
 			const milestoneLabel = (m && m.title) || "No Milestone";
+
 			let milestone = milestoneIndex[milestoneLabel];
+
 			if (!milestone) {
 				milestone = new Milestone(milestoneLabel, m);
 				milestoneIndex[milestoneLabel] = milestone;
@@ -349,7 +366,9 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 			}
 
 			const t1 = this.parseDueOn(a);
+
 			const t2 = this.parseDueOn(b);
+
 			if (t1 && t2) {
 				if (!t1.isSame(t2)) {
 					return t1.isBefore(t2) ? -1 : 1;
@@ -377,6 +396,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 
 		if (m.item.due_on) {
 			const t = moment.utc(m.item.due_on, "YYYY-MM-DDTHH:mm:ssZ");
+
 			if (t.isValid()) {
 				return t;
 			}
@@ -384,6 +404,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 
 		if (m.item.title) {
 			const t = moment.utc(m.item.title, "MMMM YYYY");
+
 			if (t.isValid()) {
 				return t.add(14, "days"); // "best guess"
 			}
@@ -397,6 +418,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 		password?: string,
 	) {
 		const github = new GitHub(this.getAPIOption());
+
 		if (username && password) {
 			github.authenticate({
 				type: "basic",
@@ -411,6 +433,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 			order: "asc",
 			per_page: 100,
 		};
+
 		const items = await fetchAll(github, github.search.issues(<any>params));
 
 		return items
@@ -431,6 +454,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 					{ remote: remote!, assignee },
 					item,
 				);
+
 				const icon = item.pull_request
 					? "git-pull-request.svg"
 					: "bug.svg";
@@ -452,15 +476,20 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 				issue.contextValue = item.pull_request
 					? "pull_request"
 					: "issue";
+
 				return issue;
 			});
 	}
 
 	private async openMilestone(milestone: Milestone) {
 		const issue = milestone.issues[0];
+
 		const item = issue.item;
+
 		const assignee = issue.query.assignee;
+
 		const url = `https://github.com/issues?utf8=%E2%9C%93&q=is%3Aopen+${item.milestone ? `milestone%3A%22${item.milestone.title}%22` : "no%3Amilestone"}${assignee ? "+assignee%3A" + assignee : ""}`;
+
 		return env.openExternal(Uri.parse(url));
 	}
 
@@ -470,7 +499,9 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 
 	private async checkoutPullRequest(issue: Issue) {
 		const remote = issue.query.remote;
+
 		const folder = remote.folders[0];
+
 		if (!folder) {
 			return window.showInformationMessage(
 				`The repository '${remote.owner}/${remote.repo}' is not checked out in any open workspace folder.`,
@@ -480,6 +511,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 		const status = await exec(`git status --short --porcelain`, {
 			cwd: folder.uri.fsPath,
 		});
+
 		if (status.stdout) {
 			return window.showInformationMessage(
 				`There are local changes in the workspace folder. Commit or stash them before checking out the pull request.`,
@@ -487,32 +519,47 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 		}
 
 		const github = new GitHub(this.getAPIOption());
+
 		const p = Uri.parse(issue.item.repository_url).path;
+
 		const repo = path.basename(p);
+
 		const owner = path.basename(path.dirname(p));
+
 		const pr = await github.pullRequests.get({
 			owner,
 			repo,
 			number: issue.item.number,
 		});
+
 		const repo_login = pr.data.head!.repo.owner.login;
+
 		const user_login = pr.data.user!.login;
+
 		const clone_url = pr.data.head!.repo.clone_url;
+
 		const remoteBranch = pr.data.head!.ref;
+
 		try {
 			let remote: string | undefined = undefined;
+
 			const remotes = await exec(`git remote -v`, {
 				cwd: folder.uri.fsPath,
 			});
+
 			let m: RegExpExecArray | null;
+
 			const r = /^([^\s]+)\s+([^\s]+)\s+\(fetch\)/gm;
+
 			while ((m = r.exec(remotes.stdout))) {
 				let fetch_url = m[2];
+
 				if (!fetch_url.endsWith(".git")) {
 					fetch_url += ".git";
 				}
 				if (fetch_url === clone_url) {
 					remote = m[1];
+
 					break;
 				}
 			}
@@ -521,6 +568,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 					prompt: "Name for the remote to add",
 					value: repo_login,
 				});
+
 				if (!remote) {
 					return;
 				}
@@ -542,6 +590,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 					? remoteBranch
 					: `${user_login}/${remoteBranch}`,
 			});
+
 			if (!localBranch) {
 				return;
 			}
@@ -575,11 +624,13 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 
 	private async getGitHubRemotes() {
 		const remotes: Record<string, GitRemote> = {};
+
 		for (const folder of workspace.workspaceFolders || []) {
 			try {
 				const { stdout } = await exec("git remote -v", {
 					cwd: folder.uri.fsPath,
 				});
+
 				for (const url of new Set(
 					allMatches(/^[^\s]+\s+([^\s]+)/gm, stdout, 1),
 				)) {
@@ -589,8 +640,11 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 
 					if (m) {
 						const [url, owner, rawRepo] = m;
+
 						const repo = rawRepo.replace(/\.git$/, "");
+
 						let remote = remotes[`${owner}/${repo}`];
+
 						if (!remote) {
 							const data = await fill(url);
 							remote = {
@@ -612,11 +666,15 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 		}
 		for (const rawRepo of this.repositories) {
 			const m = /^\s*([^/\s]+)\/([^/\s]+)\s*$/.exec(rawRepo);
+
 			if (m) {
 				const [, owner, repo] = m;
+
 				let remote = remotes[`${owner}/${repo}`];
+
 				if (!remote) {
 					const url = `https://${this.host}/${owner}/${repo}.git`;
+
 					const data = await fill(url);
 					remote = {
 						url,

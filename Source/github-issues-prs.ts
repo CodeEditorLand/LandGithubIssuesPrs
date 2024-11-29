@@ -21,10 +21,15 @@ import { allMatches, exec, fetchAll } from "./utils";
 
 interface GitRemote {
 	url: string;
+
 	owner: string;
+
 	repo: string;
+
 	username: string | null;
+
 	password: string | null;
+
 	folders: WorkspaceFolder[];
 }
 
@@ -36,6 +41,7 @@ class Milestone extends TreeItem {
 		public item: any | undefined,
 	) {
 		super(label, TreeItemCollapsibleState.Collapsed);
+
 		this.contextValue = "milestone";
 	}
 }
@@ -56,18 +62,24 @@ interface RemoteQuickPickItem extends QuickPickItem {
 
 export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 	private _onDidChangeTreeData = new EventEmitter<TreeItem | undefined>();
+
 	readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
 	private fetching = false;
+
 	private lastFetch: number | undefined;
+
 	private children: Promise<TreeItem[]> | undefined;
 
 	private username: string | undefined;
+
 	private host: string;
+
 	private repositories: string[];
 
 	constructor(private context: ExtensionContext) {
 		const subscriptions = context.subscriptions;
+
 		subscriptions.push(
 			commands.registerCommand(
 				"githubIssuesPrs.refresh",
@@ -75,6 +87,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 				this,
 			),
 		);
+
 		subscriptions.push(
 			commands.registerCommand(
 				"githubIssuesPrs.createIssue",
@@ -82,6 +95,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 				this,
 			),
 		);
+
 		subscriptions.push(
 			commands.registerCommand(
 				"githubIssuesPrs.openMilestone",
@@ -89,6 +103,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 				this,
 			),
 		);
+
 		subscriptions.push(
 			commands.registerCommand(
 				"githubIssuesPrs.openIssue",
@@ -96,6 +111,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 				this,
 			),
 		);
+
 		subscriptions.push(
 			commands.registerCommand(
 				"githubIssuesPrs.openPullRequest",
@@ -103,6 +119,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 				this,
 			),
 		);
+
 		subscriptions.push(
 			commands.registerCommand(
 				"githubIssuesPrs.checkoutPullRequest",
@@ -110,6 +127,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 				this,
 			),
 		);
+
 		subscriptions.push(
 			commands.registerCommand(
 				"githubIssuesPrs.copyNumber",
@@ -117,6 +135,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 				this,
 			),
 		);
+
 		subscriptions.push(
 			commands.registerCommand(
 				"githubIssuesPrs.copyText",
@@ -124,6 +143,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 				this,
 			),
 		);
+
 		subscriptions.push(
 			commands.registerCommand(
 				"githubIssuesPrs.copyMarkdown",
@@ -131,6 +151,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 				this,
 			),
 		);
+
 		subscriptions.push(
 			commands.registerCommand(
 				"githubIssuesPrs.copyUrl",
@@ -142,9 +163,13 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 		subscriptions.push(window.onDidChangeActiveTextEditor(this.poll, this));
 
 		const config = workspace.getConfiguration("github");
+
 		this.username = config.get<string>("username");
+
 		this.repositories = config.get<string[]>("repositories") || [];
+
 		this.host = config.get<string>("host") || "github.com";
+
 		subscriptions.push(
 			workspace.onDidChangeConfiguration(() => {
 				const config = workspace.getConfiguration("github");
@@ -163,8 +188,11 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 					newHost !== this.host
 				) {
 					this.username = newUsername;
+
 					this.repositories = newRepositories;
+
 					this.host = newHost || "github.com";
+
 					this.refresh();
 				}
 			}),
@@ -187,7 +215,9 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 		if (!this.children) {
 			try {
 				this.fetching = true;
+
 				this.lastFetch = Date.now();
+
 				await (this.children = this.fetchChildren());
 			} finally {
 				this.fetching = false;
@@ -200,7 +230,9 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 	private async refresh() {
 		if (!this.fetching) {
 			this.children = undefined;
+
 			await this.getChildren();
+
 			this._onDidChangeTreeData.fire(undefined);
 		}
 	}
@@ -270,6 +302,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 		const pick = await window.showQuickPick(urls, {
 			placeHolder: "Select the remote you want to create an issue on",
 		});
+
 		callback(pick);
 	}
 
@@ -294,6 +327,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 			const configure = new TreeItem(
 				'Configure "github.username" in settings',
 			);
+
 			configure.command = {
 				title: "Open Settings",
 				command: "workbench.action.openGlobalSettings",
@@ -341,7 +375,9 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 
 			if (!milestone) {
 				milestone = new Milestone(milestoneLabel, m);
+
 				milestoneIndex[milestoneLabel] = milestone;
+
 				milestones.push(milestone);
 			} else if (
 				m &&
@@ -350,6 +386,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 			) {
 				milestone.item = m;
 			}
+
 			milestone.issues.push(issue);
 		}
 
@@ -458,6 +495,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 				const icon = item.pull_request
 					? "git-pull-request.svg"
 					: "bug.svg";
+
 				issue.iconPath = {
 					light: this.context.asAbsolutePath(
 						path.join("thirdparty", "octicons", "light", icon),
@@ -466,6 +504,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 						path.join("thirdparty", "octicons", "dark", icon),
 					),
 				};
+
 				issue.command = {
 					title: "Open",
 					command: item.pull_request
@@ -473,6 +512,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 						: "githubIssuesPrs.openIssue",
 					arguments: [issue],
 				};
+
 				issue.contextValue = item.pull_request
 					? "pull_request"
 					: "issue";
@@ -557,12 +597,14 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 				if (!fetch_url.endsWith(".git")) {
 					fetch_url += ".git";
 				}
+
 				if (fetch_url === clone_url) {
 					remote = m[1];
 
 					break;
 				}
 			}
+
 			if (!remote) {
 				remote = await window.showInputBox({
 					prompt: "Name for the remote to add",
@@ -572,10 +614,12 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 				if (!remote) {
 					return;
 				}
+
 				await exec(`git remote add ${remote} ${clone_url}`, {
 					cwd: folder.uri.fsPath,
 				});
 			}
+
 			try {
 				await exec(`git fetch ${remote} ${remoteBranch}`, {
 					cwd: folder.uri.fsPath,
@@ -584,6 +628,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 				console.error(err);
 				// git fetch prints to stderr, continue
 			}
+
 			const localBranch = await window.showInputBox({
 				prompt: "Name for the local branch to checkout",
 				value: remoteBranch.startsWith(`${user_login}/`)
@@ -594,6 +639,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 			if (!localBranch) {
 				return;
 			}
+
 			await exec(
 				`git checkout -b ${localBranch} ${remote}/${remoteBranch}`,
 				{ cwd: folder.uri.fsPath },
@@ -647,6 +693,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 
 						if (!remote) {
 							const data = await fill(url);
+
 							remote = {
 								url,
 								owner,
@@ -655,8 +702,10 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 								password: data && data.password,
 								folders: [],
 							};
+
 							remotes[`${owner}/${repo}`] = remote;
 						}
+
 						remote.folders.push(folder);
 					}
 				}
@@ -664,6 +713,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 				// ignore
 			}
 		}
+
 		for (const rawRepo of this.repositories) {
 			const m = /^\s*([^/\s]+)\/([^/\s]+)\s*$/.exec(rawRepo);
 
@@ -676,6 +726,7 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 					const url = `https://${this.host}/${owner}/${repo}.git`;
 
 					const data = await fill(url);
+
 					remote = {
 						url,
 						owner,
@@ -684,10 +735,12 @@ export class GitHubIssuesPrsProvider implements TreeDataProvider<TreeItem> {
 						password: data && data.password,
 						folders: [],
 					};
+
 					remotes[`${owner}/${repo}`] = remote;
 				}
 			}
 		}
+
 		return Object.keys(remotes).map((key) => remotes[key]);
 	}
 

@@ -3,7 +3,9 @@ import * as GitHub from "@octokit/rest";
 
 export interface ExecResult {
 	error: Error | null;
+
 	stdout: string;
+
 	stderr: string;
 }
 
@@ -41,10 +43,12 @@ export async function fetchAll(github: GitHub, first: Promise<any>) {
 	const all = [];
 
 	let res = await first;
+
 	all.push(...res.data.items);
 
 	while (github.hasNextPage(res)) {
 		res = await github.getNextPage(res);
+
 		all.push(...res.data.items);
 	}
 

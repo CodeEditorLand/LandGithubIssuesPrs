@@ -172,7 +172,7 @@
 		"onView:githubIssuesPrs"
 	],
 	"dependencies": {
-		"@octokit/rest": "21.0.2",
+		"@octokit/rest": "21.1.0",
 		"git-credential-node": "1.1.0",
 		"moment": "2.30.1"
 	},
